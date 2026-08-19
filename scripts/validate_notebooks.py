@@ -8,7 +8,6 @@ import re
 import sys
 from pathlib import Path
 
-
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 NOTEBOOK_DIR = PROJECT_ROOT / "notebooks"
 RELATIVE_CSV_EXPORT = re.compile(r"\.to_csv\(\s*['\"][^'\"]+\.csv['\"]")
@@ -62,8 +61,8 @@ def validate_notebook(path: Path) -> list[str]:
     return errors
 
 
-def main() -> int:
-    notebook_paths = sorted(NOTEBOOK_DIR.glob("*.ipynb"))
+def run_validation(notebook_dir: Path, project_root: Path) -> int:
+    notebook_paths = sorted(notebook_dir.glob("*.ipynb"))
     if not notebook_paths:
         print("No notebooks found.", file=sys.stderr)
         return 1
@@ -73,14 +72,18 @@ def main() -> int:
         errors = validate_notebook(path)
         if errors:
             failures += 1
-            print(f"FAIL {path.relative_to(PROJECT_ROOT)}")
+            print(f"FAIL {path.relative_to(project_root)}")
             for error in errors:
                 print(f"  - {error}")
         else:
-            print(f"PASS {path.relative_to(PROJECT_ROOT)}")
+            print(f"PASS {path.relative_to(project_root)}")
 
     print(f"Validated {len(notebook_paths)} notebooks; {failures} failed.")
     return 1 if failures else 0
+
+
+def main() -> int:
+    return run_validation(NOTEBOOK_DIR, PROJECT_ROOT)
 
 
 if __name__ == "__main__":
