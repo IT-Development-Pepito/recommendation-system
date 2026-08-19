@@ -34,6 +34,8 @@ This is the authoritative workflow for people and AI agents contributing to the 
 
 Before review, run applicable formatting, static analysis, unit tests, integration tests, and a safe data-quality check. Reviewers verify acceptance criteria, data safety, security, reproducibility, migration safety, observability, and rollback readiness.
 
+For Python changes, provision the locked environment with uv and run `scripts/validate_repository.py`, `scripts/validate_notebooks.py`, scoped Ruff checks over `scripts` and `tests`, and pytest with coverage. Dependency changes must update both `pyproject.toml` and `uv.lock`. Ordinary unit tests must remain independent of SQL Server, PostgreSQL, Spark, Java, and live ODBC connections.
+
 Changes flow as `develop` → `staging` → `main`. Staging validates release candidates with representative non-production data and operational checks. Only reviewed, validated releases reach `main`.
 
 ## 5. Release and operations

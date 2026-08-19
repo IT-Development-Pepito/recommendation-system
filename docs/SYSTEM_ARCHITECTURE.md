@@ -15,6 +15,7 @@ The system produces product-association recommendations from retail transactions
 | Application database | PostgreSQL for ETL output, recommendation results, run metadata, and operational state |
 | Scheduling / observability | Batch scheduler and structured application logs; to be formalized as the pipeline matures |
 | Exploration | Jupyter notebooks and CSV reference datasets |
+| Development harness | uv lockfile, pytest, Ruff, repository/notebook validators, GitHub Actions |
 
 ## Business flow
 
@@ -52,6 +53,23 @@ SQL Server warehouse (read-only)
 - `datasets/`: local reference or exploratory datasets; production data must not be added without an approved data-governance exception.
 - `executable/`: batch launchers.
 - `logs/`: local runtime logs, excluded from version control.
+
+## Development harness flow
+
+```text
+Issue branch and local change
+           |
+           v
+uv locked environment -> repository checks -> notebook checks -> scoped Ruff -> pytest
+           |
+           v
+GitHub Actions: blocking Windows harness + advisory Linux portability
+           |
+           v
+Reviewed pull request to develop -> staging -> main
+```
+
+Harness tests use repository fixtures and notebook JSON only. They do not connect to SQL Server or PostgreSQL and do not execute Spark.
 
 ## Architectural rules
 
