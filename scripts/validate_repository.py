@@ -36,6 +36,7 @@ TEXT_SUFFIXES = {
     ".yaml",
     ".yml",
 }
+BARE_CREDENTIAL_SUFFIXES = {".bat", ".example", ".yaml", ".yml"}
 PRIVATE_KEY_MARKER = re.compile(r"-----BEGIN (?:[A-Z ]+ )?PRIVATE KEY-----")
 CREDENTIAL_ASSIGNMENT = re.compile(
     r"^\s*(?:export\s+|set\s+)?[A-Z0-9_]*(?:PASSWORD|PASSWD|SECRET|TOKEN|API_KEY)"
@@ -88,6 +89,8 @@ def validate_repository(project_root: Path, tracked_paths: Sequence[Path]) -> li
         for match in CREDENTIAL_ASSIGNMENT.finditer(text):
             value = match.group("quoted")
             if value is None:
+                if path.suffix.lower() not in BARE_CREDENTIAL_SUFFIXES:
+                    continue
                 value = match.group("bare")
             if not is_placeholder(value):
                 line = text.count("\n", 0, match.start()) + 1

@@ -66,6 +66,28 @@ def test_ignores_credential_named_variable_assigned_an_expression(tmp_path: Path
     assert all("possible literal credential" not in error for error in errors)
 
 
+def test_ignores_credential_assigned_a_bare_python_identifier(tmp_path: Path) -> None:
+    tracked = valid_repository(tmp_path)
+    source = Path("scripts/settings.py")
+    (tmp_path / source).parent.mkdir(parents=True, exist_ok=True)
+    (tmp_path / source).write_text("secret = credential_value\n", encoding="utf-8")
+
+    errors = validate_repository(tmp_path, [*tracked, source])
+
+    assert all("possible literal credential" not in error for error in errors)
+
+
+def test_ignores_credential_assigned_python_attribute_access(tmp_path: Path) -> None:
+    tracked = valid_repository(tmp_path)
+    source = Path("scripts/settings.py")
+    (tmp_path / source).parent.mkdir(parents=True, exist_ok=True)
+    (tmp_path / source).write_text("api_token = settings.api_token\n", encoding="utf-8")
+
+    errors = validate_repository(tmp_path, [*tracked, source])
+
+    assert all("possible literal credential" not in error for error in errors)
+
+
 def test_rejects_bare_environment_style_credential(tmp_path: Path) -> None:
     tracked = valid_repository(tmp_path)
     settings = Path("settings.yaml")
