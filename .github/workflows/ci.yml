@@ -1,0 +1,54 @@
+name: Harness validation
+
+on:
+  pull_request:
+    branches: [develop, staging, main]
+  push:
+    branches: [develop]
+
+permissions:
+  contents: read
+
+jobs:
+  windows-harness:
+    name: Windows harness
+    runs-on: windows-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+      - name: Install uv and Python
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+        with:
+          python-version: 3.14.6
+          enable-cache: true
+      - name: Synchronize locked environment
+        run: uv sync --locked --group notebook --group dev --no-group spark
+      - name: Validate repository
+        run: uv run python scripts/validate_repository.py
+      - name: Validate notebooks
+        run: uv run python scripts/validate_notebooks.py
+      - name: Run scoped Ruff checks
+        run: uv run ruff check scripts tests
+      - name: Run harness tests with coverage
+        run: uv run pytest --cov=scripts --cov-report=term-missing
+
+  linux-portability:
+    name: Linux portability (advisory)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+      - name: Install uv and Python
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+        with:
+          python-version: 3.14.6
+          enable-cache: true
+      - name: Synchronize locked core and development environment
+        run: uv sync --locked --group dev --no-group notebook --no-group spark
+      - name: Validate repository
+        run: uv run python scripts/validate_repository.py
+      - name: Run scoped Ruff checks
+        run: uv run ruff check scripts tests
+      - name: Run database-free harness tests
+        run: uv run pytest --cov=scripts --cov-report=term-missing
