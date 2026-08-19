@@ -1,7 +1,7 @@
 # Layered Harness Foundation Design
 
-**Status:** Approved in design review  
-**Date:** 2026-08-19  
+**Status:** Approved in design review<br>
+**Date:** 2026-08-19<br>
 **Issue:** [#4 — `[infrastructure][P1] Establish layered harness foundation`](https://github.com/IT-Development-Pepito/recommendation-system/issues/4)
 
 ## Context

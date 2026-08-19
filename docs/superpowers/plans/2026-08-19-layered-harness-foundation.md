@@ -729,7 +729,7 @@ Create `docs/brainstorms/2026-08-19-layered-harness-foundation.md`:
 ```markdown
 # Layered Harness Foundation Brainstorm
 
-**Date:** 2026-08-19  
+**Date:** 2026-08-19<br>
 **Issue:** #4
 
 ## Problem and intended outcome
