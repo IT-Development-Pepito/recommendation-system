@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.Python
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# Environments and secrets
+.env
+.env.*
+!.env.development.example
+!.env.production.example
+!env.staging.example
+
+# Editor and OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Runtime outputs
+logs/
+*.log
+artifacts/
+outputs/
+
+# Notebooks
+.ipynb_checkpoints/
