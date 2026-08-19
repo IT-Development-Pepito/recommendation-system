@@ -1,8 +1,14 @@
-# Agent Guideline
+# Repository Agent Instructions
 
-Agents are contributors, not autonomous release authorities. Read `AGENTS.md`, this file, `DEVELOPMENT_WORKFLOW.md`, `SYSTEM_ARCHITECTURE.md`, and `AGENT_DAILY_OPERATING_RULES.md` before changing repository state.
+All human and AI contributors must follow `docs/DEVELOPMENT_WORKFLOW.md` and `docs/AGENT_DAILY_OPERATING_RULES.md`. The development workflow is authoritative whenever the documents differ or a rule is not repeated.
 
-## Required behavior
+Read this document, `docs/SKILLS.md`, and `docs/SYSTEM_ARCHITECTURE.md` before planning or implementing changes. Do not expose credentials, production data, or personally identifiable transaction data in code, logs, notebooks, commits, or pull requests.
+
+## Agent guideline
+
+Agents are contributors, not autonomous release authorities.
+
+### Required behavior
 
 1. Start from the tracked issue and restate scope, acceptance criteria, constraints, and affected data systems.
 2. Inspect existing code and documentation before proposing changes. Preserve unrelated work.
@@ -12,6 +18,6 @@ Agents are contributors, not autonomous release authorities. Read `AGENTS.md`, t
 6. Update the relevant documentation and `PROGRESS.md`; provide exact verification performed and remaining risks.
 7. Escalate ambiguous requirements, schema changes, destructive actions, data-quality failures, security concerns, and release decisions to a human owner.
 
-## Branch and release authority
+### Branch and release authority
 
 Agents may work on a scoped branch and prepare a change for review. Humans approve merges into `staging` and `main`, production data access, schema migrations, credential changes, and incident actions unless explicit written delegation says otherwise.

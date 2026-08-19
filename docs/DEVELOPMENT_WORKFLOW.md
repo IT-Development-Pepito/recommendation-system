@@ -5,9 +5,13 @@ This is the authoritative workflow for people and AI agents contributing to the 
 ## 1. Intake and planning
 
 1. Create or select a tracked issue with a problem statement, owner, priority, acceptance criteria, risk, and affected environment.
-2. Classify the work as data, model/algorithm, ETL, application, infrastructure, security, defect, or documentation.
-3. Inspect the current architecture, contracts, data classification, and relevant progress entries before proposing a change.
-4. For material changes, write a design that states interfaces, rollback plan, observability, and validation. Obtain review before implementation.
+2. Use the naming convention `[type][P0|P1|P2] concise outcome`, for example `[feature][P1] Load curated sales transactions into PostgreSQL`. Valid issue types include `epic`, `feature`, `bug`, `task`, `data`, `model`, `security`, `infrastructure`, and `documentation`.
+3. Assign exactly one priority: `P0` for critical work requiring immediate attention, `P1` for important planned work, or `P2` for lower-priority improvements. Apply suitable type, component, environment, and status labels. If a needed label does not exist, create it before creating or updating the issue.
+4. Classify the work as data, model/algorithm, ETL, application, infrastructure, security, defect, or documentation.
+5. Inspect the current architecture, contracts, data classification, and relevant progress entries before proposing a change.
+6. For every feature brainstorm, write a concise, dated brainstorming record in `docs/brainstorms/`. Include the problem, intended outcome, decisions, alternatives considered, assumptions, constraints, open questions, acceptance criteria, and recommended issue breakdown. Link the record from every issue created from it so people and agents share the same reference.
+7. If a brainstorm changes the business flow, system architecture, technology stack, or data flow, update `docs/SYSTEM_ARCHITECTURE.md` in the same change before creating implementation issues. The architecture document must reflect the approved target state and identify any transition from the current state.
+8. For material changes, write a design that states interfaces, rollback plan, observability, and validation. Obtain review before implementation.
 
 ## 2. Data and AI/ML controls
 
@@ -24,6 +28,7 @@ This is the authoritative workflow for people and AI agents contributing to the 
 2. Make the smallest safe change. Keep source extraction, transformations, mining, persistence, and orchestration separately testable.
 3. Add or update automated tests before relying on implementation behavior. Include negative and data-quality cases for ETL/ML changes.
 4. Update architecture, runbook, environment examples, and `PROGRESS.md` when the public behavior, operations, or data contract changes.
+5. When implementation reveals a material drawback, blocker, risk, dependency, or intentionally out-of-scope item, record it as a linked follow-up issue. State why it matters, its affected area, a recommended next action, and an initial `P0`, `P1`, or `P2` priority so it can enter the appropriate future epic, sprint, or development cycle.
 
 ## 4. Validation and review
 

@@ -7,7 +7,7 @@ This repository contains the foundation for Pepito's product recommendation syst
 Copy the appropriate example file to a local, untracked `.env` file and fill in credentials outside version control:
 
 - `.env.development.example` for local development
-- `env.staging.example` for staging
+- `.env.staging.example` for staging
 - `.env.production.example` for production
 
 The SQL Server warehouse is a read-only source. PostgreSQL is the application database and destination for transformed data, model outputs, and operational metadata.
@@ -18,4 +18,11 @@ The SQL Server warehouse is a read-only source. PostgreSQL is the application da
 - `staging` — release-candidate validation
 - `develop` — integrated development work
 
-Read [docs/DEVELOPMENT_WORKFLOW.md](docs/DEVELOPMENT_WORKFLOW.md) before changing the system. Architecture and agent operating rules are documented in `docs/`.
+Read [docs/DEVELOPMENT_WORKFLOW.md](docs/DEVELOPMENT_WORKFLOW.md) and [docs/AGENTS.md](docs/AGENTS.md) before changing the system. Architecture and agent operating rules are documented in `docs/`.
+
+## Repository layout
+
+- `notebooks/` — exploratory Jupyter notebooks
+- `datasets/` — local reference and exploratory CSV datasets
+- `executable/` — batch launchers
+- `logs/` — local runtime logs (ignored by Git)

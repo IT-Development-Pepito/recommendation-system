@@ -33,7 +33,7 @@
 ### Task 2: Add repository documentation and safe configuration
 
 **Files:**
-- Create: `README.md`, `.gitignore`, `AGENTS.md`, `docs/*.md`, environment example files
+- Create: `README.md`, `.gitignore`, `docs/AGENTS.md`, `docs/*.md`, environment example files
 
 - [x] Add the requested governance documents with data, model, release, issue-lifecycle, and agent guidance.
 - [x] Document the SQL Server source and PostgreSQL destination separation.

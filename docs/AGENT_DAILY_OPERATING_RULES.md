@@ -1,19 +1,20 @@
 # Agent Daily Operating Rules
 
-These mandatory issue-lifecycle rules apply to every human or AI contributor. They supplement `AGENTS.md` and `docs/DEVELOPMENT_WORKFLOW.md`; the development workflow remains authoritative when a detail is not repeated here.
+These mandatory issue-lifecycle rules apply to every human or AI contributor. They supplement `docs/AGENTS.md` and `docs/DEVELOPMENT_WORKFLOW.md`; the development workflow remains authoritative when a detail is not repeated here.
 
 ## Start of work
 
-1. Work only from a clearly identified issue, or create one before material work begins.
-2. Confirm owner, objective, acceptance criteria, priority, dependencies, data classification, and target environment.
+1. Work only from a clearly identified issue, or create one before material work begins. Name new issues `[type][P0|P1|P2] concise outcome`; for example, `[bug][P0] Prevent duplicate monthly recommendation runs`.
+2. Confirm owner, objective, acceptance criteria, priority, dependencies, data classification, and target environment. Assign exactly one priority: `P0` (critical), `P1` (important), or `P2` (lowest). Apply suitable type, component, environment, and status labels; create a missing needed label before issue creation or update.
 3. Read the current issue history, `PROGRESS.md`, relevant architecture, and the latest operational context.
 4. Declare scope before editing. Escalate if the requested work includes a production release, destructive action, database migration, credential change, or unclear data access.
+5. Before creating issues from a feature brainstorm, read or create its dated record in `docs/brainstorms/`. Link the record to each resulting issue. When the approved brainstorm changes business flow, system architecture, technology stack, or data flow, update `docs/SYSTEM_ARCHITECTURE.md` before implementation work begins.
 
 ## During work
 
 1. Keep the issue status current: `Open` → `In Progress` → `In Review` → `Done`, or `Blocked` with the blocker and needed owner action.
 2. Record decisions, assumptions, implementation links, validation evidence, and material risks in the issue.
-3. Do not silently broaden scope. Create or link a follow-up issue for unrelated discoveries.
+3. Do not silently broaden scope. Create or link a follow-up issue for unrelated discoveries. Material drawbacks, blockers, risks, dependencies, or out-of-scope findings must become linked follow-up issues with context, recommended next action, affected area, and an initial priority for future epic, sprint, or development-cycle planning.
 4. Do not use production credentials or data beyond approved, least-privilege access. Redact identifiers and secrets from logs, screenshots, notebooks, commits, and discussion.
 5. Keep changes on a focused branch; rebase or merge according to team policy before review.
 

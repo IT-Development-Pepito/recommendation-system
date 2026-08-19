@@ -48,8 +48,10 @@ SQL Server warehouse (read-only)
 
 - `apriori_store.py`: per-store FP-Growth batch implementation and existing SQL Server persistence code that must be migrated to PostgreSQL.
 - `apriori.py`: earlier all-store Apriori implementation.
-- `*.ipynb`: exploratory analysis and algorithm experiments.
-- `*.csv`: local reference or exploratory datasets; production data must not be added without an approved data-governance exception.
+- `notebooks/`: exploratory analysis and algorithm experiments.
+- `datasets/`: local reference or exploratory datasets; production data must not be added without an approved data-governance exception.
+- `executable/`: batch launchers.
+- `logs/`: local runtime logs, excluded from version control.
 
 ## Architectural rules
 
