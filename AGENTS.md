@@ -6,10 +6,11 @@ Before changing the repository, read:
 
 1. `docs/DEVELOPMENT_WORKFLOW.md`
 2. `docs/AGENT_DAILY_OPERATING_RULES.md`
-3. `docs/AGENTS.md`
-4. `docs/SYSTEM_ARCHITECTURE.md`
-5. `docs/SKILLS.md`
-6. the relevant record under `docs/brainstorms/` or `docs/superpowers/specs/`
+3. `docs/PROGRESS.md`
+4. `docs/AGENTS.md`
+5. `docs/SYSTEM_ARCHITECTURE.md`
+6. `docs/SKILLS.md`
+7. the relevant record under `docs/brainstorms/` or `docs/superpowers/specs/`
 
 Use Python 3.14.6 and uv. Install the normal development environment with `uv sync --locked --group notebook --group dev --no-group spark`. Run repository validation, notebook validation, scoped Ruff checks, and pytest before requesting review.
 

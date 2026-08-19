@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import json
 import re
 import subprocess
 import sys
@@ -21,6 +22,7 @@ REQUIRED_PATHS = (
     Path(".env.production.example"),
     Path("docs/DEVELOPMENT_WORKFLOW.md"),
     Path("docs/AGENT_DAILY_OPERATING_RULES.md"),
+    Path("docs/AGENTS.md"),
     Path("docs/SYSTEM_ARCHITECTURE.md"),
     Path("docs/PROGRESS.md"),
     Path("docs/SKILLS.md"),
@@ -50,11 +52,13 @@ PLACEHOLDER_MARKERS = ("replace_me", "example", "changeme", "placeholder", "dumm
 
 
 def is_environment_file(path: Path) -> bool:
-    return path.name == ".env" or path.name.startswith(".env.")
+    name = path.name.casefold()
+    return name == ".env" or name.startswith(".env.")
 
 
 def is_approved_example(path: Path) -> bool:
-    return path.name.startswith(".env.") and path.name.endswith(".example")
+    name = path.name.casefold()
+    return name.startswith(".env.") and name.endswith(".example")
 
 
 def is_placeholder(value: str) -> bool:
@@ -64,6 +68,53 @@ def is_placeholder(value: str) -> bool:
         or lowered.startswith(("$", "{{", "<"))
         or any(marker in lowered for marker in PLACEHOLDER_MARKERS)
     )
+
+
+def credential_errors(
+    relative: Path,
+    text: str,
+    *,
+    location: str = "",
+    allow_bare: bool = False,
+) -> list[str]:
+    errors: list[str] = []
+    for match in CREDENTIAL_ASSIGNMENT.finditer(text):
+        value = match.group("quoted")
+        if value is None:
+            if not allow_bare:
+                continue
+            value = match.group("bare")
+        if not is_placeholder(value):
+            line = text.count("\n", 0, match.start()) + 1
+            position = f"{location}line {line}" if location else str(line)
+            errors.append(f"possible literal credential: {relative.as_posix()}:{position}")
+    return errors
+
+
+def notebook_credential_errors(relative: Path, text: str) -> list[str]:
+    try:
+        notebook = json.loads(text)
+    except json.JSONDecodeError:
+        return []
+    if not isinstance(notebook, dict):
+        return []
+    cells = notebook.get("cells")
+    if not isinstance(cells, list):
+        return []
+
+    errors: list[str] = []
+    for index, cell in enumerate(cells):
+        if not isinstance(cell, dict) or cell.get("cell_type") != "code":
+            continue
+        source = cell.get("source", "")
+        if isinstance(source, list) and all(isinstance(part, str) for part in source):
+            source = "".join(source)
+        if not isinstance(source, str):
+            continue
+        errors.extend(
+            credential_errors(relative, source, location=f"code cell {index} ")
+        )
+    return errors
 
 
 def validate_repository(project_root: Path, tracked_paths: Sequence[Path]) -> list[str]:
@@ -78,7 +129,7 @@ def validate_repository(project_root: Path, tracked_paths: Sequence[Path]) -> li
                 f"tracked environment file is not an approved example: {relative.as_posix()}"
             )
         path = project_root / relative
-        if path.suffix.lower() not in TEXT_SUFFIXES or not path.is_file():
+        if not path.is_file():
             continue
         try:
             text = path.read_text(encoding="utf-8")
@@ -86,15 +137,17 @@ def validate_repository(project_root: Path, tracked_paths: Sequence[Path]) -> li
             continue
         if PRIVATE_KEY_MARKER.search(text):
             errors.append(f"obvious private-key material: {relative.as_posix()}")
-        for match in CREDENTIAL_ASSIGNMENT.finditer(text):
-            value = match.group("quoted")
-            if value is None:
-                if path.suffix.lower() not in BARE_CREDENTIAL_SUFFIXES:
-                    continue
-                value = match.group("bare")
-            if not is_placeholder(value):
-                line = text.count("\n", 0, match.start()) + 1
-                errors.append(f"possible literal credential: {relative.as_posix()}:{line}")
+        suffix = path.suffix.lower()
+        if suffix == ".ipynb":
+            errors.extend(notebook_credential_errors(relative, text))
+        elif suffix in TEXT_SUFFIXES:
+            errors.extend(
+                credential_errors(
+                    relative,
+                    text,
+                    allow_bare=suffix in BARE_CREDENTIAL_SUFFIXES,
+                )
+            )
     return errors
 
 
