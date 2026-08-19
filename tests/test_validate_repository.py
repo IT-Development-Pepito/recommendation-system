@@ -53,6 +53,29 @@ def test_rejects_literal_credential_but_allows_example_value(tmp_path: Path) -> 
     assert all(".env.development.example" not in error for error in errors)
 
 
+def test_ignores_credential_named_variable_assigned_an_expression(tmp_path: Path) -> None:
+    tracked = valid_repository(tmp_path)
+    source = Path("scripts/paths.py")
+    (tmp_path / source).parent.mkdir(parents=True, exist_ok=True)
+    (tmp_path / source).write_text(
+        'secret_env = Path(".env.production")\n', encoding="utf-8"
+    )
+
+    errors = validate_repository(tmp_path, [*tracked, source])
+
+    assert all("possible literal credential" not in error for error in errors)
+
+
+def test_rejects_bare_environment_style_credential(tmp_path: Path) -> None:
+    tracked = valid_repository(tmp_path)
+    settings = Path("settings.yaml")
+    (tmp_path / settings).write_text("API_TOKEN: live-value-123\n", encoding="utf-8")
+
+    errors = validate_repository(tmp_path, [*tracked, settings])
+
+    assert "possible literal credential: settings.yaml:1" in errors
+
+
 def test_accepts_clean_repository(tmp_path: Path) -> None:
     tracked = valid_repository(tmp_path)
     assert validate_repository(tmp_path, tracked) == []

@@ -39,7 +39,10 @@ TEXT_SUFFIXES = {
 PRIVATE_KEY_MARKER = re.compile(r"-----BEGIN (?:[A-Z ]+ )?PRIVATE KEY-----")
 CREDENTIAL_ASSIGNMENT = re.compile(
     r"^\s*(?:export\s+|set\s+)?[A-Z0-9_]*(?:PASSWORD|PASSWD|SECRET|TOKEN|API_KEY)"
-    r"[A-Z0-9_]*\s*[:=]\s*[\"']?([^\"'\s#]+)",
+    r"[A-Z0-9_]*\s*[:=]\s*(?:"
+    r"(?P<quote>[\"'])(?P<quoted>[^\"'\r\n]*)(?P=quote)"
+    r"|(?P<bare>[^\"'()\[\]{},\s#]+)"
+    r")\s*(?:#.*)?$",
     re.IGNORECASE | re.MULTILINE,
 )
 PLACEHOLDER_MARKERS = ("replace_me", "example", "changeme", "placeholder", "dummy", "your_")
@@ -83,7 +86,10 @@ def validate_repository(project_root: Path, tracked_paths: Sequence[Path]) -> li
         if PRIVATE_KEY_MARKER.search(text):
             errors.append(f"obvious private-key material: {relative.as_posix()}")
         for match in CREDENTIAL_ASSIGNMENT.finditer(text):
-            if not is_placeholder(match.group(1)):
+            value = match.group("quoted")
+            if value is None:
+                value = match.group("bare")
+            if not is_placeholder(value):
                 line = text.count("\n", 0, match.start()) + 1
                 errors.append(f"possible literal credential: {relative.as_posix()}:{line}")
     return errors
