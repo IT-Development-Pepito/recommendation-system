@@ -12,6 +12,25 @@ Copy the appropriate example file to a local, untracked `.env` file and fill in 
 
 The SQL Server warehouse is a read-only source. PostgreSQL is the application database and destination for transformed data, model outputs, and operational metadata.
 
+## Development setup
+
+The supported interpreter is Python 3.14.6. Install [uv](https://docs.astral.sh/uv/), then create the locked core, notebook, and development environment without the optional Spark group:
+
+```powershell
+uv sync --locked --group notebook --group dev --no-group spark
+```
+
+Run the same checks used by the authoritative Windows CI job:
+
+```powershell
+uv run python scripts/validate_repository.py
+uv run python scripts/validate_notebooks.py
+uv run ruff check scripts tests
+uv run pytest --cov=scripts --cov-report=term-missing
+```
+
+PySpark is isolated in the `spark` dependency group and is not required for the Phase 1 harness. These checks do not connect to SQL Server or PostgreSQL.
+
 ## Branches
 
 - `main` — production-ready releases

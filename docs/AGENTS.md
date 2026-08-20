@@ -21,3 +21,22 @@ Agents are contributors, not autonomous release authorities.
 ### Branch and release authority
 
 Agents may work on a scoped branch and prepare a change for review. Humans approve merges into `staging` and `main`, production data access, schema migrations, credential changes, and incident actions unless explicit written delegation says otherwise.
+
+## Harness rules
+
+Use Python 3.14.6 and provision the locked environment before validation:
+
+```powershell
+uv sync --locked --group notebook --group dev --no-group spark
+```
+
+Run the required harness checks before requesting review:
+
+```powershell
+uv run python scripts/validate_repository.py
+uv run python scripts/validate_notebooks.py
+uv run ruff check scripts tests
+uv run pytest --cov=scripts --cov-report=term-missing
+```
+
+Dependency changes must refresh `uv.lock` alongside `pyproject.toml`. Ordinary unit tests must remain database-free and must not require SQL Server, PostgreSQL, Spark, Java, or a live ODBC connection.

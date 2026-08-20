@@ -5,9 +5,10 @@ from __future__ import annotations
 import ast
 import json
 import re
+import subprocess
 import sys
+from collections.abc import Sequence
 from pathlib import Path
-
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 NOTEBOOK_DIR = PROJECT_ROOT / "notebooks"
@@ -27,9 +28,26 @@ def validate_notebook(path: Path) -> list[str]:
     except (OSError, json.JSONDecodeError) as exc:
         return [f"cannot read valid notebook JSON: {exc}"]
 
+    if not isinstance(notebook, dict):
+        return ["notebook root must be a JSON object"]
     cells = notebook.get("cells", [])
+    if not isinstance(cells, list):
+        return ["notebook cells must be a list"]
     if not cells:
         return ["contains no cells"]
+
+    for index, cell in enumerate(cells):
+        if not isinstance(cell, dict):
+            errors.append(f"cell {index} must be a JSON object")
+            continue
+        source = cell.get("source", "")
+        if not isinstance(source, str) and not (
+            isinstance(source, list)
+            and all(isinstance(part, str) for part in source)
+        ):
+            errors.append(f"cell {index} source must be a string or a list of strings")
+    if errors:
+        return errors
 
     first_cell = cells[0]
     if first_cell.get("cell_type") != "markdown" or not source_text(first_cell).lstrip().startswith("# "):
@@ -62,8 +80,7 @@ def validate_notebook(path: Path) -> list[str]:
     return errors
 
 
-def main() -> int:
-    notebook_paths = sorted(NOTEBOOK_DIR.glob("*.ipynb"))
+def validate_paths(notebook_paths: Sequence[Path], project_root: Path) -> int:
     if not notebook_paths:
         print("No notebooks found.", file=sys.stderr)
         return 1
@@ -73,14 +90,37 @@ def main() -> int:
         errors = validate_notebook(path)
         if errors:
             failures += 1
-            print(f"FAIL {path.relative_to(PROJECT_ROOT)}")
+            print(f"FAIL {path.relative_to(project_root).as_posix()}")
             for error in errors:
                 print(f"  - {error}")
         else:
-            print(f"PASS {path.relative_to(PROJECT_ROOT)}")
+            print(f"PASS {path.relative_to(project_root).as_posix()}")
 
     print(f"Validated {len(notebook_paths)} notebooks; {failures} failed.")
     return 1 if failures else 0
+
+
+def run_validation(notebook_dir: Path, project_root: Path) -> int:
+    return validate_paths(sorted(notebook_dir.rglob("*.ipynb")), project_root)
+
+
+def tracked_notebook_paths(project_root: Path) -> list[Path]:
+    result = subprocess.run(
+        ["git", "-C", str(project_root), "ls-files", "-z", "--", "*.ipynb"],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    return [project_root / value for value in result.stdout.split("\0") if value]
+
+
+def main() -> int:
+    try:
+        notebook_paths = tracked_notebook_paths(PROJECT_ROOT)
+    except (OSError, subprocess.CalledProcessError) as exc:
+        print(f"FAIL cannot enumerate tracked notebooks: {exc}", file=sys.stderr)
+        return 1
+    return validate_paths(notebook_paths, PROJECT_ROOT)
 
 
 if __name__ == "__main__":
